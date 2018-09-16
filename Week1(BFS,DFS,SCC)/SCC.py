@@ -1,14 +1,7 @@
 import sys
 import numpy as np
-from Queue import Queue
-from collections import deque
 from sets import Set
-import resource
-# from resource import setrlimit
-from sys import setrecursionlimit
 import datetime
-
-
 
 class Graph(object):
     def __init__(self, direction_file):
@@ -23,7 +16,6 @@ class Graph(object):
         self.explored = Set()
         self.size_counter = 0
         self.big5 = np.zeros(5)
-        self.secondtime = False
 
     def flip_direction(self):
         'Flip the order of the edges'
@@ -41,10 +33,6 @@ class Graph(object):
     def edgeSearch(self, node):
         'Search the nodes adjacent that has not been explored and return them as a list.'
         unexplored = [n for n in self.adjecentList[node.originalLabel - 1] if not n in self.explored]
-        # []
-        # for edge in self.adjecentList[node.originalLabel - 1]:
-        #     if edge not in self.explored:
-        #         unexplored.append(edge)
         return unexplored
     
     def adjecentListMaker(self):
@@ -56,29 +44,6 @@ class Graph(object):
             adj_list[self.direction[i][0] - 1].append(self.direction[i][1])
         self.adjecentList = adj_list
 
-    def checkexplored(self, node):
-        ''' True when the node doesn't have any unexplored edge.'''
-        it_is_deadend = True
-        edges = self.edgeSearch(node)
-        if len(edges) == 0:
-            return it_is_deadend
-        for edge in edges:
-            if int(edge) not in self.explored:
-                    it_is_deadend = False
-        return it_is_deadend
-
-    def noRoute(self, node, stack):
-        ''' True when it doesn't have any edge that is unexplored or instack '''
-        no_route = True
-        edges = self.edgeSearch(node)
-        if len(edges) == 0:
-            return no_route
-        for edge in edges:
-            if int(edge) not in self.explored:
-                if edge not in stack.instack:
-                    no_route = False
-        return no_route
-            
 class Node(object):
     def __init__(self, label):
         self.originalLabel = label
@@ -88,37 +53,6 @@ class Node(object):
 
     def __str__(self):
         return "Original Label: " + str(self.originalLabel)
-
-def DFS_rec(graph, node):
-
-    if node.originalLabel in graph.explored:
-        return
-
-    graph.explored.add(node.originalLabel)
-    edges = graph.edgeSearch(node)
-    # print(edges)
-
-    for edge in edges:
-        DFS_rec(graph, graph.nodes1st[edge-1])
-
-    graph.FTcounter += 1
-    node.finishingtime = graph.FTcounter
-    # print("node:", node.originalLabel," is FTcounter", graph.FTcounter)
-    graph.nodes2nd[graph.FTcounter-1] = node
-
-def DFS_rec2(graph, node):
-
-    if node.originalLabel in graph.explored:
-        return
-
-    graph.explored.add(node.originalLabel)
-    graph.size_counter += 1
-
-    edges = graph.edgeSearch(node)
-
-    for edge in edges:
-        DFS_rec2(graph, graph.nodes1st[edge-1])
-    
 
 def DFS_new(graph, node):
         
@@ -151,23 +85,18 @@ def DFS_new2(graph, node):
         if node.originalLabel not in graph.explored:
             graph.size_counter += 1
         graph.explored.add(node.originalLabel)
-        # print("graph size", graph.size_counter)
-        # print(test_node.originalLabel, "'s leader is ", graph.leaderCounter)
 
         #Expand the neighbers
         edges = graph.edgeSearch(node)
-        # print(edges)
 
         #Push in current node into new nodes list
         if len(edges) == 0:
-            # print("it is zero len")
             if len(parents) == 0:
                 break
             node = parents.pop()
         
         else:
             parents.append(node)
-            # graph.nodes1st[edges[0]-1].parents = node
             node = graph.nodes1st[edges[0]-1]
 
 def main(data):
@@ -176,16 +105,12 @@ def main(data):
     G = Graph(data)
 
     #flip the direction
-    # G.flip_direction()
-    # print("1st flipping done")
     G.adjecentListMaker()
     print('1st Adjacent completed')
 
     #Make nodes
     G.initNodes()
     print('Initial node ready')
-    # for node in G.nodes1st:
-    #     print(node)
 
     #1st DFS loop
     i = len(G.nodes1st)
@@ -214,7 +139,6 @@ def main(data):
     G.initExplored()
     G.initNodes()
     print("Initialized the 1stnodes' parents")
-    G.secondtime = True
 
     #2nd DFS loop
     i = len(G.nodes2nd)
@@ -224,8 +148,9 @@ def main(data):
         if node.originalLabel not in G.explored:
             DFS_new2(G, node)
 
+        print("Extracting 5 biggest size")
+
         size = G.size_counter
-        # # print("size: ", size)
 
         if size != 0:
             if size > G.big5[4]:
@@ -246,8 +171,6 @@ def main(data):
                         G.big5[3] = size
                 else:
                     G.big5[4] = size
-
-        # print(G.big5)
         i -= 1
     
     print("Second DFS done")
@@ -262,9 +185,6 @@ def main(data):
 
 
 if __name__ == "__main__":
-    setrecursionlimit(2 ** 20)
-    # resource.setrlimit(resource.RLIMIT_STACK, (10**6, 10**6))
-
     #read the txt file
     inputfile = sys.argv[1]
     data = np.loadtxt(inputfile, usecols=range(0,2), delimiter=" ", dtype=int)

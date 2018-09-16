@@ -4,7 +4,6 @@ import itertools
 class Node(object):
     def __init__(self, id):
         self.id = id
-        self.shortest_dist = 0
         self.neighber = []
 
     def __str__(self):
@@ -58,9 +57,6 @@ class PriorityQueue():
             else:
                 print(self.pq[i][2].id, self.pq[i][0])
 
-    def length(self):
-            print(len(self.entry_finder))
-
 
 def dijkstra(goal_index, neighber):
     #Initialize nodes
@@ -97,15 +93,10 @@ def dijkstra(goal_index, neighber):
             #compare the key value
             if neighber_node.id not in explored:
                 if (n_cost + key) < pq.lookupKey(neighber_node):
-                    # print("decreasing")
                     pq.add_task(neighber_node, n_cost + key)
             # pq.showpq()
             # pq.length()
-
-
         node, key = pq.pop_task()
-
-        # print('')
 
 
 def initializeNode(neighber):
@@ -123,9 +114,7 @@ def readfile():
 
 
     b = [x.strip('\n').strip(' ').strip('\r').split('\t')[:-1] for x in lines]
-    # print(b[0])
     for b_ele in b:
-        # print("b_ele",b_ele)
         c = [y.split(',') for y in b_ele]
         if c[1] == ['']:
             c = []
