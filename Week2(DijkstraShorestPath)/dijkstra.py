@@ -142,3 +142,6 @@ def run():
         result_list.append(shortest_path)
     return result_list
 
+if __name__ == "__main__":
+    print(run())
+
