@@ -148,7 +148,7 @@ def main(data):
         if node.originalLabel not in G.explored:
             DFS_new2(G, node)
 
-        print("Extracting 5 biggest size")
+        # print("Extracting 5 biggest size")
 
         size = G.size_counter
 
